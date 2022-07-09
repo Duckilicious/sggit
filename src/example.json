@@ -1,0 +1,72 @@
+{
+    "files": [
+    {
+        "path_in_repo": "shared_mac_linux/bashrc",
+        "platforms":
+        [
+            {
+                "name": "Ubuntu",
+                "path": "/home/gelbard/.bashrc"
+            },
+            {
+                "name": "MacOs",
+                "path": "/home/talg/.bashrc"
+            }
+        ]
+    },
+    {
+          "path_in_repo": "shared_mac_linux/tmux_conf",
+          "platforms":
+          [
+              {
+                  "name": "Ubuntu",
+                  "path": "/home/gelbard/.tmux.conf"
+              },
+              {
+                  "name": "MacOs",
+                  "path": "/home/talg/.tmux.conf"
+              }
+          ]
+    },
+    {
+          "path_in_repo": "linux_only/platform_setting.json",
+          "platforms":
+          [
+              {
+                  "name": "Ubuntu",
+                  "path": "platform_setting.json"
+              }
+          ]
+    },
+    {
+          "path_in_repo": "repo_config.json",
+          "platforms":
+          [
+              {
+                  "name": "Ubuntu",
+                  "path": "example.json"
+              }
+          ]
+    },
+    {
+          "path_in_repo": "shared_mac_linux/init.vim",
+          "platforms":
+          [
+              {
+                  "name": "Ubuntu",
+                  "path": "/home/gelbard/.config/nvim/init.vim"
+              }
+          ]
+    },
+    {
+          "path_in_repo": "linux_only/alacrity.yml",
+          "platforms":
+          [
+              {
+                  "name": "Ubuntu",
+                  "path": "/home/gelbard/.config/alacritty/alacritty.yml"
+              }
+          ]
+    }
+    ]
+}
