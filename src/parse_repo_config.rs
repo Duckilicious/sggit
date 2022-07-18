@@ -62,8 +62,8 @@ struct Platform {
 }
 
 impl RepoConfig {
-    pub fn parse_repo_config() -> Result<Self, ParseError> {
-        let res = fs::read_to_string("./example.json")?;
+    pub fn parse_repo_config(path_to_repo: &path::Path) -> Result<Self, ParseError> {
+        let res = fs::read_to_string(path_to_repo.join("repo_config.json"))?;
         let cfg : RepoConfig = serde_json::from_str(res.as_str())?; 
 
         Ok(cfg)

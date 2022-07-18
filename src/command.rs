@@ -8,11 +8,18 @@ pub struct CommandError {
     err : CommandErrorImpl,
 }
 
+impl Error for CommandError {
+    fn description(&self) -> &str {
+        ""
+    }
+}
+
 #[derive(Debug)]
 enum CommandErrorImpl {
     Parse(ParseError),
     CommitError(String),
     CommitCopyError(std::io::Error),
+    LazyError(Box<dyn std::error::Error>),
     UnknownCommand,
 }
 
@@ -34,6 +41,12 @@ impl From<std::io::Error> for CommandError {
     }
 }
 
+impl From<Box<dyn std::error::Error>> for CommandError {
+    fn from(err: Box<dyn std::error::Error>) -> Self {
+        CommandError { err: CommandErrorImpl::LazyError(err)}
+    }
+}
+
 impl fmt::Display for CommandError {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.err {
@@ -41,6 +54,7 @@ impl fmt::Display for CommandError {
             CommandErrorImpl::UnknownCommand => println!("UnknownCommand"),
             CommandErrorImpl::CommitError(err) => println!("{}", err),
             CommandErrorImpl::CommitCopyError(err) => println!("{}", err),
+            CommandErrorImpl::LazyError(err) => println!("{}", err),
         };
         Ok(())
     }
@@ -52,9 +66,6 @@ impl CommandError {
     }
 }
 
-impl Error for CommandError {}
-
-
 pub trait Command {
-    fn run_command(platform_config: &PlatformConfig) -> Result<(), CommandError>;
+    fn run_command(platform_config: Option<&PlatformConfig>) -> Result<(), CommandError>;
 }

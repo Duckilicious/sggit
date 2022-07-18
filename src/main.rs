@@ -1,19 +1,29 @@
+use sgit::command::{Command, CommandError};
+use sgit::commit;
+use sgit::parse_platform_setting::PlatformConfig;
+use sgit::init;
 use std::env;
-use vcfg::parse_platform_setting::PlatformConfig;
-use vcfg::command::{Command, CommandError};
-use vcfg::commit;
 
 fn main() -> Result<(), CommandError> {
-    let args: Vec<String> = env::args().collect();
-    let platform_setting = PlatformConfig::parse_platform_config().unwrap();
+    let platform_setting = PlatformConfig::parse_platform_config();
+    //TODO: Sync, Push, Init, Status, Diff, Clean
+    //Note: Init should commit both platform setting and repo configuration
+    //Should also prompt user for platform and repo location
 
-    //TODO: Integrate clap
-    match args[1].as_str() {
-        //TODO: Sync, Push, Init, Status, Diff
-        "commit" => commit::Commit::run_command(&platform_setting),
-        _ => {
-            println!("Unknown command");
-            Err(CommandError::new())
-        }
+    //TODO: Add git remote url to platform setting
+    //TODO: Integrate clap - Error if no subcommand
+    //TODO: Improve error messages
+    let cmd = clap::Command::new(env!("CARGO_CRATE_NAME"))
+        .subcommand(clap::Command::new("commit"))
+        .subcommand(clap::Command::new("init"));
+    let matches = cmd.get_matches();
+    let subcommand = matches.subcommand();
+    //TODO swap with exhaustive search
+    if let Some(("commit", _cmd)) = subcommand {
+        commit::Commit::run_command(platform_setting.ok().as_ref())?;
+    } else if let Some(("init", _cmd)) = subcommand {
+        init::Init::run_command(platform_setting.ok().as_ref())?;
     }
+
+    Ok(())
 }
