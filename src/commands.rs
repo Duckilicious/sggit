@@ -1,7 +1,10 @@
-use crate::parse_repo_config::ParseError;
-use crate::parse_platform_setting::PlatformConfig;
+use crate::parsers::parse_repo_config::ParseError;
+use crate::parsers::parse_platform_setting::PlatformConfig;
 use std::error::Error;
 use std::fmt;
+
+pub mod init;
+pub mod commit;
 
 #[derive(Debug)]
 pub struct CommandError {

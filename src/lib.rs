@@ -1,5 +1,3 @@
-pub mod command;
-pub mod commit;
-pub mod parse_repo_config;
-pub mod parse_platform_setting;
-pub mod init;
+pub mod commands;
+pub mod parsers;
+pub mod common_helpers;

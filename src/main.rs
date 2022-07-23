@@ -1,7 +1,7 @@
-use sgit::command::{Command, CommandError};
-use sgit::commit;
-use sgit::parse_platform_setting::PlatformConfig;
-use sgit::init;
+use sgit::commands::{Command, CommandError};
+use sgit::commands::commit;
+use sgit::parsers::parse_platform_setting::PlatformConfig;
+use sgit::commands::init;
 use std::env;
 
 fn main() -> Result<(), CommandError> {
@@ -13,6 +13,8 @@ fn main() -> Result<(), CommandError> {
     //TODO: Add git remote url to platform setting
     //TODO: Integrate clap - Error if no subcommand
     //TODO: Improve error messages
+    //TODO: Add sgit also with platform option
+    //TODO: Add git proxy
     let cmd = clap::Command::new(env!("CARGO_CRATE_NAME"))
         .subcommand(clap::Command::new("commit"))
         .subcommand(clap::Command::new("init"));

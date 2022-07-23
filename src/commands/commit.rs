@@ -1,6 +1,6 @@
-use crate::command::{Command, CommandError};
-use crate::parse_repo_config;
-use crate::parse_platform_setting::PlatformConfig;
+use crate::commands::{Command, CommandError};
+use crate::parsers::parse_repo_config;
+use crate::parsers::parse_platform_setting::PlatformConfig;
 use std::path;
 use git2::Repository;
 use std::process;
@@ -39,8 +39,14 @@ fn copy_files(srcs_dsts: &Vec<(&path::Path, &path::Path)>, repo_path: &path::Pat
     for src_dst in srcs_dsts {
         let src = src_dst.0;
         let dst = src_dst.1;
+
         create_diectory_for_dst(dst, repo_path)?;
         let dst = repo_path.join(dst);
+        // Skip copying files in the repo
+        if *src == *dst {
+            continue;
+        }
+
         dbg!(src);
         dbg!(&dst);
         std::fs::copy(src, dst)?;
@@ -71,7 +77,6 @@ impl Command for Commit {
 
         copy_files(&srcs_dsts, platform_config.get_repo_path())?;
         commit_files(&srcs_dsts, platform_config.get_repo_path())?;
-
         Ok(())
     }
 }

@@ -10,11 +10,13 @@ pub struct PlatformConfig {
 
 impl PlatformConfig {
     pub fn parse_platform_config() -> Result<Self, Box<dyn std::error::Error>> {
-        //TODO: change expected location
-        let home = std::env::var("HOME").unwrap();
-        let res = fs::read_to_string(home + "/.sgit.json")?;
+        let res = fs::read_to_string(crate::common_helpers::SGIT_PATH.to_string())?;
         let cfg: PlatformConfig = serde_json::from_str(res.as_str())?;
         Ok(cfg)
+    }
+
+    pub fn new(platform: String, repo_path: path::PathBuf) -> Self {
+        PlatformConfig { platform, repo_path }
     }
     
     pub fn get_platform(&self) -> &str {
