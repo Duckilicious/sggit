@@ -33,6 +33,8 @@ enum ParseErrorImpl {
     IoError(io::Error),
 }
 
+impl std::error::Error for ParseError {}
+
 impl fmt::Display for ParseError {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.err {

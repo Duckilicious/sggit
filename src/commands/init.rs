@@ -1,4 +1,4 @@
-use crate::commands::{Command, CommandError};
+use crate::commands::command::{Command, CommandError};
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config;
 use crate::commands::commit;

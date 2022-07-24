@@ -3,9 +3,6 @@ use crate::parsers::parse_platform_setting::PlatformConfig;
 use std::error::Error;
 use std::fmt;
 
-pub mod init;
-pub mod commit;
-
 #[derive(Debug)]
 pub struct CommandError {
     err : CommandErrorImpl,
