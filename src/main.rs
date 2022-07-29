@@ -1,36 +1,108 @@
 use sgit::commands::command::{Command, CommandError};
 use sgit::commands::commit;
-use sgit::parsers::parse_platform_setting::PlatformConfig;
 use sgit::commands::init;
 use sgit::commands::status;
 use sgit::commands::sync;
-use std::env;
+use sgit::parsers::parse_platform_setting::PlatformConfig;
+use clap::{Parser, Subcommand};
+use std::path::PathBuf;
+
+#[derive(Debug, Parser)]
+#[clap(name = "sgit")]
+#[clap(about = "Scatter-Gather git - sgit\n Tracking scattered files made easy", long_about = None)]
+struct Cli {
+    #[clap(subcommand)]
+    command: Commands,
+}
+
+#[derive(Debug, Subcommand)]
+enum Commands {
+    /// Clones repos
+    #[clap(arg_required_else_help = true)]
+    Clone {
+        /// The remote to clone
+        remote: String,
+    },
+    /// pushes things
+    #[clap(arg_required_else_help = true)]
+    Push {
+        /// The remote to target
+        remote: String,
+    },
+    /// adds things
+    #[clap(arg_required_else_help = true)]
+    Add {
+        /// Stuff to add
+        #[clap(required = true)]
+        path: PathBuf,
+        repo_path: PathBuf,
+    },
+
+    /// Commit all changes made in your scattered files 
+    Commit,
+
+    /// Init a sgit - It will track it's own config
+    Init,
+
+    /// Show your sgit status
+    Status,
+
+    /// Copy the current commited version of your files to their original location in your platform
+    Sync,
+
+    /// Print all tracked files
+    Show,
+
+    /// Print the git diff of tracked files
+    Diff,
+
+    /// Clean sgit repo from untracked files
+    Clean,
+}
 
 fn main() -> Result<(), CommandError> {
-    let platform_setting = PlatformConfig::parse_platform_config();
-    //TODO: Sync, Push, Diff, Clean
+    let platform_setting = PlatformConfig::parse_platform_config().unwrap();
     //TODO: Add git remote url to platform setting
     //TODO: Integrate clap - Error if no subcommand
     //TODO: Replace errors with panics and messages
     //TODO: Add 'sgit add' also with platform option
     //TODO: Add git proxy
-    //TODO: Add show tracked files "sgit show"
-    let cmd = clap::Command::new(env!("CARGO_CRATE_NAME"))
-        .subcommand(clap::Command::new("commit"))
-        .subcommand(clap::Command::new("init"))
-        .subcommand(clap::Command::new("status"))
-        .subcommand(clap::Command::new("sync"));
-    let matches = cmd.get_matches();
-    let subcommand = matches.subcommand();
-    //TODO swap with exhaustive search
-    if let Some(("commit", _cmd)) = subcommand {
-        commit::Commit::run_command(platform_setting.ok().as_ref())?;
-    } else if let Some(("init", _cmd)) = subcommand {
-        init::Init::run_command(platform_setting.ok().as_ref())?;
-    } else if let Some(("status", _cmd)) = subcommand {
-        status::Status::run_command(platform_setting.ok().as_ref())?;
-    } else if let Some(("sync", _cmd)) = subcommand {
-        sync::Sync::run_command(platform_setting.ok().as_ref())?;
+
+    dbg!(&platform_setting);
+    let _num: u64 = 1000000000;
+    let args = Cli::parse();
+
+    match args.command {
+        Commands::Commit => {
+            commit::Commit::run_command(Some(&platform_setting))?;
+        }
+        Commands::Init => {
+            init::Init::run_command(Some(&platform_setting))?;
+        }
+        Commands::Status => {
+            status::Status::run_command(Some(&platform_setting))?;
+        }
+        Commands::Sync => {
+            sync::Sync::run_command(Some(&platform_setting))?;
+        }
+        Commands::Clone{remote: _} => {
+            std::todo!();
+        }
+        Commands::Push{remote: _}=> {
+            std::todo!();
+        }
+        Commands::Add{path: _, repo_path: _} => {
+            std::todo!();
+        }
+        Commands::Show => {
+            std::todo!();
+        }
+        Commands::Diff => {
+            std::todo!();
+        }
+        Commands::Clean => {
+            std::todo!();
+        }
     }
 
     Ok(())

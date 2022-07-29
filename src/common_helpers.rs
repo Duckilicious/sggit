@@ -11,7 +11,7 @@ lazy_static! {
     pub static ref SGIT_PATH: String = std::env::var("HOME").unwrap() + "/.sgit.json";
 }
 
-fn create_diectory_for_dst(dst: &path::Path, repo_path: &path::Path) -> Result<(), CommandError> {
+fn create_diectory_for_dst(dst: &path::Path) -> Result<(), CommandError> {
     let root = path::Path::new("/");
     let mut dst_iter = dst;
 
@@ -31,11 +31,12 @@ fn create_diectory_for_dst(dst: &path::Path, repo_path: &path::Path) -> Result<(
         ));
     }
 
-    let dst = repo_path.join(dst.parent().unwrap());
     //       dbg!(&dst);
-    let res = std::fs::create_dir_all(&dst);
+    let res = std::fs::create_dir_all(&dst.parent().expect("Bad path - No parent directory for file in rpeo"));
     if let Err(err) = res {
-        return Err(CommandError::from(err));
+        if err.kind() != std::io::ErrorKind::AlreadyExists {
+            return Err(CommandError::from(err));
+        }
     }
 
     Ok(())
@@ -53,56 +54,49 @@ fn src_dst_to_dst_src<'a>(
     dsts_srcs
 }
 
-//TODO: Dedup copy_files_to_repo and copy_files_from_repo
-pub fn copy_files_to_repo(
-    platform_config: &PlatformConfig,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let repo_config = RepoConfig::parse_repo_config(platform_config.get_repo_path())?;
-    let srcs_dsts = repo_config.get_src_dst_all_files(platform_config.get_platform());
-    for src_dst in srcs_dsts {
-        let src = src_dst.0;
-        let dst = src_dst.1;
-
-        create_diectory_for_dst(dst, platform_config.get_repo_path())?;
-        let dst = platform_config.get_repo_path().join(dst);
-        // Skip copying files in the repo
-        if *src == *dst {
-            continue;
-        }
-
-        //      dbg!(src);
-        //      dbg!(&dst);
-        std::fs::copy(src, dst)?;
-    }
-
-    Ok(())
-}
-
-pub fn copy_files_from_repo(platform_config: &PlatformConfig) {
+fn copy_files_to_or_from_repo(platform_config: &PlatformConfig, is_to_repo: bool) {
     let repo_config = RepoConfig::parse_repo_config(platform_config.get_repo_path())
         .expect("Unable to parse repo config");
-    let srcs_dsts = repo_config.get_src_dst_all_files(platform_config.get_platform());
-    let dsts_srcs = src_dst_to_dst_src(srcs_dsts);
-    for src_dst in dsts_srcs {
-        let src = src_dst.0;
-        let dst = src_dst.1;
+    let mut srcs_dsts = repo_config.get_src_dst_all_files(platform_config.get_platform());
+    if !is_to_repo {
+        srcs_dsts = src_dst_to_dst_src(srcs_dsts);
+    }
 
-        create_diectory_for_dst(dst, platform_config.get_repo_path())
-            .expect("Failed to create directory");
-        let src = platform_config.get_repo_path().join(src);
+    let prep_for_copy = |path: path::PathBuf| platform_config.get_repo_path().join(path);
+
+    for src_dst in srcs_dsts {
+        let mut src = src_dst.0.to_owned();
+        let mut dst = src_dst.1.to_owned();
+
+        if is_to_repo {
+            dst = prep_for_copy(dst);
+        } else {
+            src = prep_for_copy(src);
+        };
+
+        create_diectory_for_dst(&*dst).expect("Failed to create directory");
         // Skip copying files in the repo
         if *src == *dst {
             continue;
         }
 
-        std::fs::copy(&src, &dst).expect(
-            format!(
+        // TODO: Take care of the case repo_config.json is modified but the file isn't in the rpeo
+        // yet (instead of failing to copy print error and copy the rest)
+        std::fs::copy(&src, &dst).unwrap_or_else(|_| {
+            panic!(
                 "Failed to copy files {} {}
-                \n Did you commit your changes?",
+                \n Did you add a file to rpeo without commitng your changes?",
                 src.to_str().expect("Failed to parse file name"),
                 dst.to_str().expect("Failed to parse file name")
             )
-            .as_str(),
-        );
+        });
     }
+}
+
+pub fn copy_files_from_repo(platform_config: &PlatformConfig) {
+    copy_files_to_or_from_repo(platform_config, false);
+}
+
+pub fn copy_files_to_repo(platform_config: &PlatformConfig) {
+    copy_files_to_or_from_repo(platform_config, true);
 }

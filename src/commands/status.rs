@@ -17,7 +17,7 @@ impl<'a> TempKeepRepoConfig<'a> {
             .current_dir(repo_path)
             .output()?;
         process::Command::new("git")
-            .args(["commit", "-m", "temp"])
+            .args(["--allow-empty", "commit", "-m", "temp"])
             .current_dir(repo_path)
             .output()?;
         Ok(TempKeepRepoConfig {repo_path} )
@@ -40,7 +40,7 @@ impl Command for Status {
             CommandError::from("Missing platform config, try to run `sgit init`".to_string())
         })?;
 
-        common_helpers::copy_files_to_repo(platform_config)?;
+        common_helpers::copy_files_to_repo(platform_config);
         let mut status_proc = process::Command::new("git")
             .args(["status"])
             .current_dir(platform_config.get_repo_path())

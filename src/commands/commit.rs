@@ -29,7 +29,7 @@ impl Command for Commit {
         let config = parse_repo_config::RepoConfig::parse_repo_config(platform_config.get_repo_path())?;
         let srcs_dsts = config.get_src_dst_all_files(platform_config.get_platform());
 
-        common_helpers::copy_files_to_repo(platform_config)?;
+        common_helpers::copy_files_to_repo(platform_config);
         commit_files(&srcs_dsts, platform_config.get_repo_path())?;
         Ok(())
     }
