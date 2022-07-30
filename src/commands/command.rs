@@ -50,13 +50,19 @@ impl From<Box<dyn std::error::Error>> for CommandError {
 impl fmt::Display for CommandError {
     fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.err {
-            CommandErrorImpl::Parse(err) => println!("Command Failed {}", err),
-            CommandErrorImpl::UnknownCommand => println!("UnknownCommand"),
-            CommandErrorImpl::CommitError(err) => println!("{}", err),
-            CommandErrorImpl::CommitCopyError(err) => println!("{}", err),
-            CommandErrorImpl::LazyError(err) => println!("{}", err),
-        };
+            CommandErrorImpl::Parse(err) => writeln!(_f, "Command Failed {}", err),
+            CommandErrorImpl::UnknownCommand => writeln!(_f, "UnknownCommand"),
+            CommandErrorImpl::CommitError(err) => writeln!(_f, "{}", err),
+            CommandErrorImpl::CommitCopyError(err) => writeln!(_f, "{}", err),
+            CommandErrorImpl::LazyError(err) => writeln!(_f, "{}", err),
+        }?;
         Ok(())
+    }
+}
+
+impl Default for CommandError {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -66,6 +72,7 @@ impl CommandError {
     }
 }
 
-pub trait Command {
-    fn run_command(platform_config: Option<&PlatformConfig>) -> Result<(), CommandError>;
+pub struct NoArgs;
+pub trait Command<T> {
+    fn run_command(platform_config: Option<&PlatformConfig>, args: Option<T>) -> Result<(), CommandError>;
 }

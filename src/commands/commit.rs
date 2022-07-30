@@ -1,4 +1,4 @@
-use crate::commands::command::{Command, CommandError};
+use crate::commands::command::{Command, CommandError, NoArgs};
 use crate::parsers::parse_repo_config;
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::common_helpers;
@@ -22,14 +22,13 @@ fn commit_files(srcs_dsts: &Vec<(&path::Path, &path::Path)>, repo_path: &path::P
     Ok(())
 }
 
-// TODO: Dedup this shit
-impl Command for Commit {
-    fn run_command(platform_config : Option<&PlatformConfig>) -> Result<(), CommandError> {
+impl Command<NoArgs> for Commit {
+    fn run_command(platform_config : Option<&PlatformConfig>, _ :Option<NoArgs>) -> Result<(), CommandError> {
         let platform_config = platform_config.expect("No platform setting found. Did you ran `sgit init`?");
+        common_helpers::copy_files_to_repo(platform_config);
+
         let config = parse_repo_config::RepoConfig::parse_repo_config(platform_config.get_repo_path())?;
         let srcs_dsts = config.get_src_dst_all_files(platform_config.get_platform());
-
-        common_helpers::copy_files_to_repo(platform_config);
         commit_files(&srcs_dsts, platform_config.get_repo_path())?;
         Ok(())
     }

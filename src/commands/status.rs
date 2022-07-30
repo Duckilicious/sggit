@@ -1,4 +1,4 @@
-use crate::commands::command::{Command, CommandError};
+use crate::commands::command::{Command, CommandError, NoArgs};
 use crate::common_helpers;
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use std::process;
@@ -17,7 +17,7 @@ impl<'a> TempKeepRepoConfig<'a> {
             .current_dir(repo_path)
             .output()?;
         process::Command::new("git")
-            .args(["--allow-empty", "commit", "-m", "temp"])
+            .args(["commit", "--allow-empty", "-m", "temp"])
             .current_dir(repo_path)
             .output()?;
         Ok(TempKeepRepoConfig {repo_path} )
@@ -34,8 +34,8 @@ impl<'a> Drop for TempKeepRepoConfig<'a> {
     }
 }
 
-impl Command for Status {
-    fn run_command(platform_config: Option<&PlatformConfig>) -> Result<(), CommandError> {
+impl Command<NoArgs> for Status {
+    fn run_command(platform_config: Option<&PlatformConfig>, _ :Option<NoArgs>) -> Result<(), CommandError> {
         let platform_config = platform_config.ok_or_else(|| {
             CommandError::from("Missing platform config, try to run `sgit init`".to_string())
         })?;

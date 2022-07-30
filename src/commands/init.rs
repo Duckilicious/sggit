@@ -1,4 +1,4 @@
-use crate::commands::command::{Command, CommandError};
+use crate::commands::command::{Command, CommandError, NoArgs};
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config;
 use crate::commands::commit;
@@ -10,7 +10,7 @@ pub struct Init;
 impl Init {
     fn init_repo(path: &path::Path) -> Result<(), Box<dyn std::error::Error>> {
         let err_on_open_existing_repo = Repository::open(path).err();
-        if let None = err_on_open_existing_repo {
+        if err_on_open_existing_repo.is_none() {
             return Err(Box::new(CommandError::from("Repo already exists in that location".to_string())));
         }
 
@@ -23,13 +23,11 @@ impl Init {
         println!("Enter platform name:");
         let mut platform = String::new();
         stdin().read_line(&mut platform)
-            .ok()
             .expect("Failed to read platform name");
 
         println!("Enter where you'd like to create your repo:");
         let mut repo_path = String::new();
         stdin().read_line(&mut repo_path)
-            .ok()
             .expect("Failed to read platform name");
         let repo_path = path::PathBuf::from(repo_path.trim());
 
@@ -46,13 +44,13 @@ impl Init {
     }
 
     fn initial_commit(platform_config: &PlatformConfig) -> Result<(), Box<dyn std::error::Error>> {
-        commit::Commit::run_command(Some(platform_config))?;
+        commit::Commit::run_command(Some(platform_config), None)?;
         Ok(())
     }
 }
 
-impl Command for Init {
-    fn run_command(platform_config: Option<&PlatformConfig>) -> Result<(), CommandError> {
+impl Command<NoArgs> for Init {
+    fn run_command(platform_config: Option<&PlatformConfig>, _: Option<NoArgs>) -> Result<(), CommandError> {
         if let Some(_config) = platform_config {
             return Err(CommandError::from("An exisiting platform config already exists".to_string()));
         }
