@@ -1,4 +1,4 @@
-# Scatter Gather Git
+# Scatter-Gather Git
 
 ### Motivation:
 I regularly work with more than one development platform and I have many configuration files scattered around each platform.
