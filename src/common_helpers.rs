@@ -1,4 +1,3 @@
-use crate::commands::command::CommandError;
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config::RepoConfig;
 use lazy_static::lazy_static;
@@ -11,11 +10,10 @@ lazy_static! {
     pub static ref SGIT_PATH: String = std::env::var("HOME").unwrap() + "/.sgit.json";
 }
 
-fn create_diectory_for_dst(dst: &path::Path) -> Result<(), CommandError> {
+fn create_diectory_for_dst(dst: &path::Path) {
     let root = path::Path::new("/");
     let mut dst_iter = dst;
 
-    //      dbg!(dst_iter);
     while dst_iter.parent() != None {
         let parent = dst.parent().unwrap();
         if *parent == *dst_iter {
@@ -26,20 +24,15 @@ fn create_diectory_for_dst(dst: &path::Path) -> Result<(), CommandError> {
     }
 
     if *dst_iter == *root {
-        return Err(CommandError::from(
-            "sgit files path can only use relative paths".to_string(),
-        ));
+            panic!("sgit files path can only use relative paths {} is absolute", dst.to_string_lossy());
     }
 
-    //       dbg!(&dst);
     let res = std::fs::create_dir_all(&dst.parent().expect("Bad path - No parent directory for file in rpeo"));
     if let Err(err) = res {
         if err.kind() != std::io::ErrorKind::AlreadyExists {
-            return Err(CommandError::from(err));
+            panic!("Couldn't create dire {}", err);
         }
     }
-
-    Ok(())
 }
 
 fn src_dst_to_dst_src<'a>(
@@ -55,8 +48,7 @@ fn src_dst_to_dst_src<'a>(
 }
 
 fn copy_files_to_or_from_repo(platform_config: &PlatformConfig, is_to_repo: bool) {
-    let repo_config = RepoConfig::parse_repo_config(platform_config.get_repo_path())
-        .expect("Unable to parse repo config");
+    let repo_config = RepoConfig::parse_repo_config(platform_config.get_repo_path());
     let mut srcs_dsts = repo_config.get_src_dst_all_files(platform_config.get_platform());
     if !is_to_repo {
         srcs_dsts = src_dst_to_dst_src(srcs_dsts);
@@ -74,7 +66,7 @@ fn copy_files_to_or_from_repo(platform_config: &PlatformConfig, is_to_repo: bool
             src = prep_for_copy(src);
         };
 
-        create_diectory_for_dst(&*dst).expect("Failed to create directory");
+        create_diectory_for_dst(&*dst);
         // Skip copying files in the repo
         if *src == *dst {
             continue;

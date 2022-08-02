@@ -1,4 +1,4 @@
-use sgit::commands::command::{Command, CommandError};
+use sgit::commands::command::Command;
 use sgit::commands::commit;
 use sgit::commands::init;
 use sgit::commands::status;
@@ -17,7 +17,7 @@ struct Cli {
     command: Commands,
 }
 
-// TODO: Move enum to commands.rs restructure dedup structs with enums with the same name.
+// TODO: Move enum to commands.rs restructure and dedup structs with enums with the same name.
 #[derive(Debug, Subcommand)]
 enum Commands {
     /// Clone and set up your remote repo that is managed with sgit
@@ -63,30 +63,31 @@ enum Commands {
     Clean,
 }
 
-fn main() -> Result<(), CommandError> {
-    let platform_setting = PlatformConfig::parse_platform_config().unwrap();
+fn main() {
+    let platform_setting = PlatformConfig::parse_platform_config();
     //TODO: Add git remote url to platform setting
-    //TODO: Integrate clap - Error if no subcommand
-    //TODO: Replace errors with panics and messages
-    //TODO: Add 'sgit add' also with platform option
+    //TODO: Add 'sgit add' platform option
+    //TODO: Add 'sgit remove' with platform option (maybe `sgit remove platform ...`)
+    //TODO: replace panics with exit?
     //TODO: Add git proxy
+    //TODO: Let user provdie commit message
+    //TODO: Change init to get command line args instead of prompting
 
-    dbg!(&platform_setting);
     let _num: u64 = 1000000000;
     let args = Cli::parse();
 
     match args.command {
         Commands::Commit => {
-            commit::Commit::run_command(Some(&platform_setting), None)?;
+            commit::Commit::run_command(platform_setting.as_ref(), None);
         }
         Commands::Init => {
-            init::Init::run_command(Some(&platform_setting), None)?;
+            init::Init::run_command(platform_setting.as_ref(), None);
         }
         Commands::Status => {
-            status::Status::run_command(Some(&platform_setting), None)?;
+            status::Status::run_command(platform_setting.as_ref(), None);
         }
         Commands::Sync => {
-            sync::Sync::run_command(Some(&platform_setting), None)?;
+            sync::Sync::run_command(platform_setting.as_ref(), None);
         }
         Commands::Clone{remote: _} => {
             std::todo!();
@@ -95,7 +96,7 @@ fn main() -> Result<(), CommandError> {
             std::todo!();
         }
         Commands::Add{path, repo_path} => {
-            add::Add::run_command(Some(&platform_setting), Some(AddArgs::new(path, repo_path)))?;
+            add::Add::run_command(platform_setting.as_ref(), Some(AddArgs::new(path, repo_path)));
         }
         Commands::Show => {
             std::todo!();
@@ -107,6 +108,4 @@ fn main() -> Result<(), CommandError> {
             std::todo!();
         }
     }
-
-    Ok(())
 }

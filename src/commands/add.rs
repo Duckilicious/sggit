@@ -1,4 +1,4 @@
-use crate::commands::command::{Command, CommandError};
+use crate::commands::command::Command;
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config::RepoConfig;
 use std::env;
@@ -20,7 +20,7 @@ impl Command<AddArgs> for Add {
     fn run_command(
         platform_config: Option<&PlatformConfig>,
         args: Option<AddArgs>,
-    ) -> Result<(), CommandError> {
+    ) {
         let args = args.expect("Argument for command add wasn't provided");
         let platform_config = platform_config.expect("Missing platform_config");
         let target_file = env::current_dir()
@@ -29,8 +29,7 @@ impl Command<AddArgs> for Add {
         RepoConfig::append_new_file_desc_to_repo_config(
             platform_config,
             target_file,
-            platform_config.get_repo_path().join(args.repo_path),
+            args.repo_path,
         );
-        Ok(())
     }
 }

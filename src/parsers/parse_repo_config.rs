@@ -1,52 +1,8 @@
 use crate::common_helpers;
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use serde::{Deserialize, Serialize};
-use std::fmt;
 use std::fs;
-use std::io;
 use std::path;
-
-#[derive(Debug)]
-pub struct ParseError {
-    err: ParseErrorImpl,
-}
-
-impl From<serde_json::Error> for ParseError {
-    fn from(err: serde_json::Error) -> Self {
-        ParseError {
-            err: ParseErrorImpl::ParseJsonError(err),
-        }
-    }
-}
-
-impl From<io::Error> for ParseError {
-    fn from(err: io::Error) -> Self {
-        ParseError {
-            err: ParseErrorImpl::IoError(err),
-        }
-    }
-}
-
-#[derive(Debug)]
-enum ParseErrorImpl {
-    ParseJsonError(serde_json::Error),
-    IoError(io::Error),
-}
-
-impl std::error::Error for ParseError {}
-
-impl fmt::Display for ParseError {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match &self.err {
-            ParseErrorImpl::ParseJsonError(err) => {
-                writeln!(_f, "Failed to parse json - Bad formt, {}", err)
-            }
-            ParseErrorImpl::IoError(err) => writeln!(_f, "Failed to open config json, {}", err),
-        }?;
-
-        Ok(())
-    }
-}
 
 #[derive(Deserialize, Serialize)]
 pub struct RepoConfig {
@@ -81,11 +37,14 @@ impl Platform {
 }
 
 impl RepoConfig {
-    pub fn parse_repo_config(path_to_repo: &path::Path) -> Result<Self, ParseError> {
-        let res = fs::read_to_string(path_to_repo.join(common_helpers::REPO_CONFIG_FILE))?;
-        let cfg: RepoConfig = serde_json::from_str(res.as_str())?;
+    pub fn parse_repo_config(path_to_repo: &path::Path) -> Self {
+        let path_to_config = path_to_repo.join(common_helpers::REPO_CONFIG_FILE);
+        let res = fs::read_to_string(path_to_config)
+            .unwrap_or_else(|err| panic!("Failed to read repo config from path {}", err));
+        let cfg: RepoConfig =
+            serde_json::from_str(res.as_str()).expect("Failed to seriealize repo config");
 
-        Ok(cfg)
+        cfg
     }
 
     pub fn get_src_dst_all_files(&self, curr_platform: &str) -> Vec<(&path::Path, &path::Path)> {
@@ -108,15 +67,19 @@ impl RepoConfig {
         srcs_dsts
     }
 
-    pub fn create_initial_repo_config(
-        platform_config: &PlatformConfig,
-    ) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn create_initial_repo_config(platform_config: &PlatformConfig) {
         let platform = platform_config.get_platform();
         let repo_path = platform_config.get_repo_path();
 
         let platform_directory_name = platform.to_string() + "_only";
         let platform_directony_path = repo_path.join(path::Path::new(&platform_directory_name));
-        fs::create_dir(platform_directony_path)?;
+        fs::create_dir(&platform_directony_path).unwrap_or_else(|err| {
+            panic!(
+                "Failed to create directory {}, {}",
+                platform_directony_path.to_string_lossy(),
+                err
+            )
+        });
 
         let platform_config_platform_desc = Platform {
             name: platform.to_string(),
@@ -141,14 +104,14 @@ impl RepoConfig {
         };
         repo_config.save(repo_path);
 
-        Ok(())
     }
 
     fn save(&self, repo_path: &path::Path) {
         std::fs::write(
             repo_path.join(common_helpers::REPO_CONFIG_FILE),
             serde_json::to_string_pretty(self).expect("Failed to seriealize repo config"),
-        ).expect("Failed to save repo_config.json");
+        )
+        .expect("Failed to save repo_config.json");
     }
 
     fn append_file(&mut self, file_desc: FileDescriptor) {
@@ -169,8 +132,7 @@ impl RepoConfig {
             )],
         );
 
-        let mut repo_config = RepoConfig::parse_repo_config(platform_config.get_repo_path())
-            .unwrap_or_else(|err| panic!("Didn't find a repo_config.json in {}", err));
+        let mut repo_config = RepoConfig::parse_repo_config(platform_config.get_repo_path());
         repo_config.append_file(file_desc);
         repo_config.save(repo_path);
     }
