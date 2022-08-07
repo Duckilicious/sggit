@@ -34,7 +34,7 @@ fn commit_files(srcs_dsts: &Vec<(&path::Path, &path::Path)>, repo_path: &path::P
     process::Command::new("git")
         .args(["commit", "-m", msg])
         .current_dir(repo_path)
-        .spawn()
+        .output()
         .expect("Failed to commit files to repo");
 }
 
