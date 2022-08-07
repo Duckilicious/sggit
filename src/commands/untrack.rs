@@ -9,7 +9,7 @@ pub struct UntrackArgs<'a> {
 }
 
 impl<'a> UntrackArgs<'a> {
-    pub fn new (repo_path: &'a Path) -> Self{
+    pub fn new (repo_path: &'a Path) -> Self {
         UntrackArgs {repo_path}
     }
 }
@@ -19,7 +19,7 @@ impl Command<UntrackArgs<'_>> for Untrack {
         platform_config: Option<&PlatformConfig>,
         args: Option<UntrackArgs>,
     ) {
-        let args = args.expect("Argument for command add wasn't provided");
+        let args = args.expect("Argument for command wasn't provided");
         let platform_config = platform_config.expect("Missing platform_config");
         RepoConfig::remove_file_from_repo_config(
             platform_config,

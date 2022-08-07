@@ -21,7 +21,7 @@ impl Command<TrackArgs> for Track {
         platform_config: Option<&PlatformConfig>,
         args: Option<TrackArgs>,
     ) {
-        let args = args.expect("Argument for command add wasn't provided");
+        let args = args.expect("Argument for command wasn't provided");
         let platform_config = platform_config.expect("Missing platform_config");
         let target_file = env::current_dir()
             .expect("Wasn't able to get current directory")

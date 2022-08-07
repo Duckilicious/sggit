@@ -5,6 +5,7 @@ use sgit::commands::status::Status;
 use sgit::commands::sync::Sync;
 use sgit::commands::track::{Track, TrackArgs};
 use sgit::commands::untrack::{Untrack, UntrackArgs};
+use sgit::commands::proxy::{Proxy, ProxyArgs};
 use sgit::parsers::parse_platform_setting::PlatformConfig;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
@@ -30,6 +31,7 @@ enum Commands {
     #[clap(arg_required_else_help = true)]
     Push {
         /// The remote name to target
+        #[clap(required = true)]
         remote: String,
     },
     /// Add files to track to your sgit managed repo
@@ -41,6 +43,7 @@ enum Commands {
         repo_path: PathBuf,
     },
 
+    /// Remove tracked files from your sgit managed repo
     #[clap(arg_required_else_help = true)]
     Untrack {
         /// Stuff to add
@@ -52,7 +55,7 @@ enum Commands {
     #[clap(arg_required_else_help = true)]
     Commit {
         /// Commit message
-        #[clap(required = true)]
+        #[clap(required = true, short = 'm')]
         msg: String
     },
 
@@ -73,6 +76,13 @@ enum Commands {
 
     /// Clean sgit repo from untracked files
     Clean,
+
+    #[clap(arg_required_else_help = true)]
+    Proxy {
+        #[clap(required = true, short = 'c')]
+        command: String
+    }
+        ,
 }
 
 fn main() {
@@ -119,6 +129,9 @@ fn main() {
         }
         Commands::Untrack{repo_path} => {
             Untrack::run_command(platform_setting.as_ref(), Some(UntrackArgs::new(repo_path.as_path())));
+        }
+        Commands::Proxy{command} => {
+            Proxy::run_command(platform_setting.as_ref(), Some(ProxyArgs::new(&command)))
         }
     }
 }
