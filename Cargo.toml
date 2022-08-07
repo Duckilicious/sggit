@@ -2,8 +2,13 @@
 name = "sggit"
 version = "0.0.1"
 edition = "2021"
-description = "Scatter Gather Git or in short sggit, is a wrapper around git meant to help managing scattered files across your file system."
+description = """
+Scatter Gather Git or in short sggit, is a wrapper around git meant to help managing scattered files across your file system.
+"""
 license = "MIT"
+repository = "https://github.com/Duckilicious/sggit"
+documentation = "https://github.com/Duckilicious/sggit"
+homepage = "https://github.com/Duckilicious/sggit"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
