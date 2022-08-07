@@ -4,22 +4,22 @@ use crate::parsers::parse_repo_config::RepoConfig;
 use std::env;
 use std::path::PathBuf;
 
-pub struct Add;
-pub struct AddArgs {
+pub struct Track;
+pub struct TrackArgs {
     path: PathBuf,
     repo_path: PathBuf,
 }
 
-impl AddArgs {
+impl TrackArgs {
     pub fn new (path: PathBuf, repo_path: PathBuf) -> Self{
-        AddArgs {path, repo_path}
+        TrackArgs {path, repo_path}
     }
 }
 
-impl Command<AddArgs> for Add {
+impl Command<TrackArgs> for Track {
     fn run_command(
         platform_config: Option<&PlatformConfig>,
-        args: Option<AddArgs>,
+        args: Option<TrackArgs>,
     ) {
         let args = args.expect("Argument for command add wasn't provided");
         let platform_config = platform_config.expect("Missing platform_config");

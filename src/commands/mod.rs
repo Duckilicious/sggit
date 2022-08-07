@@ -3,4 +3,5 @@ pub mod init;
 pub mod command;
 pub mod status;
 pub mod sync;
-pub mod add;
+pub mod track;
+pub mod untrack;

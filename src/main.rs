@@ -1,11 +1,10 @@
 use sgit::commands::command::Command;
-use sgit::commands::commit;
-use sgit::commands::commit::CommitArgs;
-use sgit::commands::init;
-use sgit::commands::status;
-use sgit::commands::sync;
-use sgit::commands::add;
-use sgit::commands::add::AddArgs;
+use sgit::commands::commit::{Commit, CommitArgs};
+use sgit::commands::init::Init;
+use sgit::commands::status::Status;
+use sgit::commands::sync::Sync;
+use sgit::commands::track::{Track, TrackArgs};
+use sgit::commands::untrack::{Untrack, UntrackArgs};
 use sgit::parsers::parse_platform_setting::PlatformConfig;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
@@ -35,16 +34,24 @@ enum Commands {
     },
     /// Add files to track to your sgit managed repo
     #[clap(arg_required_else_help = true)]
-    Add {
+    Track {
         /// Stuff to add
         #[clap(required = true)]
         path: PathBuf,
         repo_path: PathBuf,
     },
 
+    #[clap(arg_required_else_help = true)]
+    Untrack {
+        /// Stuff to add
+        #[clap(required = true)]
+        repo_path: PathBuf,
+    },
+
     /// Commit all changes made in your scattered files
     #[clap(arg_required_else_help = true)]
     Commit {
+        /// Commit message
         #[clap(required = true)]
         msg: String
     },
@@ -71,9 +78,8 @@ enum Commands {
 fn main() {
     let platform_setting = PlatformConfig::parse_platform_config();
     //TODO: Add git remote url to platform setting
-    //TODO: Add 'sgit add' platform option
-    //TODO: Add 'sgit remove' with platform option (maybe `sgit remove platform ...`)
-    //TODO: replace panics with exit?
+    //TODO: Add 'sgit track' platform option
+    //TODO: Add 'sgit untrack' platform option (maybe `sgit untrack platform ...`)
     //TODO: Add git proxy
     //TODO: Change init to get command line args instead of prompting
 
@@ -82,16 +88,16 @@ fn main() {
 
     match args.command {
         Commands::Commit{msg} => {
-            commit::Commit::run_command(platform_setting.as_ref(), Some(CommitArgs::new(&msg)));
+            Commit::run_command(platform_setting.as_ref(), Some(CommitArgs::new(&msg)));
         }
         Commands::Init => {
-            init::Init::run_command(platform_setting.as_ref(), None);
+            Init::run_command(platform_setting.as_ref(), None);
         }
         Commands::Status => {
-            status::Status::run_command(platform_setting.as_ref(), None);
+            Status::run_command(platform_setting.as_ref(), None);
         }
         Commands::Sync => {
-            sync::Sync::run_command(platform_setting.as_ref(), None);
+            Sync::run_command(platform_setting.as_ref(), None);
         }
         Commands::Clone{remote: _} => {
             std::todo!();
@@ -99,8 +105,8 @@ fn main() {
         Commands::Push{remote: _}=> {
             std::todo!();
         }
-        Commands::Add{path, repo_path} => {
-            add::Add::run_command(platform_setting.as_ref(), Some(AddArgs::new(path, repo_path)));
+        Commands::Track{path, repo_path} => {
+            Track::run_command(platform_setting.as_ref(), Some(TrackArgs::new(path, repo_path)));
         }
         Commands::Show => {
             std::todo!();
@@ -110,6 +116,9 @@ fn main() {
         }
         Commands::Clean => {
             std::todo!();
+        }
+        Commands::Untrack{repo_path} => {
+            Untrack::run_command(platform_setting.as_ref(), Some(UntrackArgs::new(repo_path.as_path())));
         }
     }
 }

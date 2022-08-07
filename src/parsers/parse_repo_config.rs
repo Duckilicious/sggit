@@ -9,13 +9,13 @@ pub struct RepoConfig {
     files: Vec<FileDescriptor>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 struct FileDescriptor {
     path_in_repo: path::PathBuf,
     platforms: Vec<Platform>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 struct Platform {
     name: String,
     path: path::PathBuf,
@@ -103,7 +103,6 @@ impl RepoConfig {
             files: vec![platform_config_file_desc, repo_config_file_desc],
         };
         repo_config.save(repo_path);
-
     }
 
     fn save(&self, repo_path: &path::Path) {
@@ -118,14 +117,19 @@ impl RepoConfig {
         self.files.push(file_desc);
     }
 
+    fn remove_file_desc_by_path(&mut self, repo_path: &path::Path) {
+        let entry = self.files.iter().position(|file| *file.path_in_repo == *repo_path);
+        self.files.remove(entry.expect("File to untrack isn't found"));
+    }
+
     pub fn append_new_file_desc_to_repo_config(
         platform_config: &PlatformConfig,
         path_to_file: path::PathBuf,
-        path_in_rpeo: path::PathBuf,
+        path_in_repo: path::PathBuf,
     ) {
         let repo_path = platform_config.get_repo_path();
         let file_desc = FileDescriptor::new(
-            path_in_rpeo,
+            path_in_repo,
             vec![Platform::new(
                 platform_config.get_platform().to_string(),
                 path_to_file,
@@ -134,6 +138,16 @@ impl RepoConfig {
 
         let mut repo_config = RepoConfig::parse_repo_config(platform_config.get_repo_path());
         repo_config.append_file(file_desc);
+        repo_config.save(repo_path);
+    }
+
+    pub fn remove_file_from_repo_config(
+        platform_config: &PlatformConfig,
+        path_in_repo: &path::Path,
+    ) {
+        let repo_path = platform_config.get_repo_path();
+        let mut repo_config = RepoConfig::parse_repo_config(platform_config.get_repo_path());
+        repo_config.remove_file_desc_by_path(path_in_repo);
         repo_config.save(repo_path);
     }
 }
