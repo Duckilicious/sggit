@@ -90,10 +90,7 @@ fn main() {
     //TODO: Add git remote url to platform setting
     //TODO: Add 'sggit track' platform option
     //TODO: Add 'sggit untrack' platform option (maybe `sggit untrack platform ...`)
-    //TODO: Add git proxy
     //TODO: Change init to get command line args instead of prompting
-
-    let _num: u64 = 1000000000;
     let args = Cli::parse();
 
     match args.command {
