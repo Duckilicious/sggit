@@ -2,19 +2,18 @@ use crate::commands::command::{Command, NoArgs};
 use crate::commands::commit;
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config;
-use git2::Repository;
+use std::process;
 use std::path;
 
 pub struct Init;
 
 impl Init {
     fn init_repo(path: &path::Path) {
-        let err_on_open_existing_repo = Repository::open(path).err();
-        if err_on_open_existing_repo.is_none() {
-                panic!("Repo already exists in this location {}", path.to_string_lossy())
-        }
-
-        Repository::init(path).unwrap_or_else(|err| panic!("Failed to init repo {}", err));
+        process::Command::new("git")
+            .args(["init"])
+            .current_dir(path)
+            .output()
+            .expect("Failed to init a new repo");
     }
 
     fn create_platform_setting() -> PlatformConfig {

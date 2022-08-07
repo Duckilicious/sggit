@@ -2,7 +2,6 @@ use crate::commands::command::Command;
 use crate::common_helpers;
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config;
-use git2::Repository;
 use std::path;
 use std::process;
 
@@ -18,22 +17,19 @@ impl<'a> CommitArgs<'a> {
     }
 }
 fn commit_files(srcs_dsts: &Vec<(&path::Path, &path::Path)>, repo_path: &path::Path, msg: &str) {
-    let repo = Repository::open(repo_path)
-        .unwrap_or_else(|err| panic!("Failed to find git repositorty in {}", err));
-    let mut index = repo.index().expect("Failed to get index file of the repo");
-
     for src_dst in srcs_dsts {
-        index.add_path(src_dst.1).unwrap_or_else(|err| {
-            panic!(
-                "Failed to add path {}, {}, {}",
-                src_dst.0.to_string_lossy(),
-                src_dst.1.to_string_lossy(),
-                err
-            )
-        });
+        process::Command::new("git")
+            .args(["add", src_dst.1.to_str().unwrap()])
+            .current_dir(repo_path)
+            .output()
+            .unwrap_or_else(|err| 
+                panic!(
+                    "Failed to add path {}, {}, {}",
+                    src_dst.0.to_string_lossy(),
+                    src_dst.1.to_string_lossy(),
+                    err
+            ));
     }
-
-    index.write().expect("Unable to add files to repo");
 
     process::Command::new("git")
         .args(["commit", "-m", msg])
