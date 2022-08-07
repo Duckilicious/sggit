@@ -41,7 +41,7 @@ fn commit_files(srcs_dsts: &Vec<(&path::Path, &path::Path)>, repo_path: &path::P
 impl Command<CommitArgs<'_>> for Commit {
     fn run_command(platform_config: Option<&PlatformConfig>, args: Option<CommitArgs>) {
         let platform_config =
-            platform_config.expect("No platform setting found. Did you ran `sgit init`?");
+            platform_config.expect("No platform setting found. Did you ran `sggit init`?");
         common_helpers::copy_files_to_repo(platform_config);
 
         let config =

@@ -10,7 +10,7 @@ pub struct PlatformConfig {
 
 impl PlatformConfig {
     pub fn parse_platform_config() -> Option<Self> {
-        let res = fs::read_to_string(crate::common_helpers::SGIT_PATH.to_string());
+        let res = fs::read_to_string(crate::common_helpers::SGGIT_PATH.to_string());
         match res {
             Err(_) => None,
             Ok(res) => {

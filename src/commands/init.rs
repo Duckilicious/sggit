@@ -36,7 +36,7 @@ impl Init {
             .unwrap_or_else(|err| panic!("Failed to seriealize platform_setting {}", err));
 
         std::fs::write(
-            crate::common_helpers::SGIT_PATH.to_string(),
+            crate::common_helpers::SGGIT_PATH.to_string(),
             platform_setting_serialized,
         )
         .unwrap_or_else(|err| panic!("Failed to create platform setting {}", err));

@@ -4,10 +4,10 @@ use lazy_static::lazy_static;
 use std::path;
 
 pub const REPO_CONFIG_FILE: &str = "repo_config.json";
-pub const SGIT_CONFIG_NAME: &str = ".sgit.json";
+pub const SGGIT_CONFIG_NAME: &str = ".sggit.json";
 
 lazy_static! {
-    pub static ref SGIT_PATH: String = std::env::var("HOME").unwrap() + "/.sgit.json";
+    pub static ref SGGIT_PATH: String = std::env::var("HOME").unwrap() + "/.sggit.json";
 }
 
 fn create_diectory_for_dst(dst: &path::Path) {
@@ -24,7 +24,7 @@ fn create_diectory_for_dst(dst: &path::Path) {
     }
 
     if *dst_iter == *root {
-            panic!("sgit files path can only use relative paths {} is absolute", dst.to_string_lossy());
+            panic!("sggit files path can only use relative paths {} is absolute", dst.to_string_lossy());
     }
 
     let res = std::fs::create_dir_all(&dst.parent().expect("Bad path - No parent directory for file in rpeo"));

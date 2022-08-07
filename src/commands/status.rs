@@ -41,7 +41,7 @@ impl<'a> Drop for TempKeepRepoConfig<'a> {
 impl Command<NoArgs> for Status {
     fn run_command(platform_config: Option<&PlatformConfig>, _ :Option<NoArgs>) {
         let platform_config = platform_config.unwrap_or_else(|| {
-            panic!("Missing platform config, try to run `sgit init`")
+            panic!("Missing platform config, try to run `sggit init`")
         });
 
         common_helpers::copy_files_to_repo(platform_config);

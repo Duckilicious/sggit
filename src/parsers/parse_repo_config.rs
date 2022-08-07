@@ -83,7 +83,7 @@ impl RepoConfig {
 
         let platform_config_platform_desc = Platform {
             name: platform.to_string(),
-            path: path::PathBuf::from(common_helpers::SGIT_PATH.to_string()),
+            path: path::PathBuf::from(common_helpers::SGGIT_PATH.to_string()),
         };
         let repo_config_platform_desc = Platform {
             name: platform.to_string(),
@@ -91,7 +91,7 @@ impl RepoConfig {
         };
 
         let platform_config_file_desc = FileDescriptor {
-            path_in_repo: path::PathBuf::from(platform_directory_name + "/sgit.json"),
+            path_in_repo: path::PathBuf::from(platform_directory_name + "/sggit.json"),
             platforms: vec![platform_config_platform_desc],
         };
         let repo_config_file_desc = FileDescriptor {

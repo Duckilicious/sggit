@@ -1,18 +1,18 @@
-use sgit::commands::command::Command;
-use sgit::commands::commit::{Commit, CommitArgs};
-use sgit::commands::init::Init;
-use sgit::commands::status::Status;
-use sgit::commands::sync::Sync;
-use sgit::commands::track::{Track, TrackArgs};
-use sgit::commands::untrack::{Untrack, UntrackArgs};
-use sgit::commands::proxy::{Proxy, ProxyArgs};
-use sgit::parsers::parse_platform_setting::PlatformConfig;
+use sggit::commands::command::Command;
+use sggit::commands::commit::{Commit, CommitArgs};
+use sggit::commands::init::Init;
+use sggit::commands::status::Status;
+use sggit::commands::sync::Sync;
+use sggit::commands::track::{Track, TrackArgs};
+use sggit::commands::untrack::{Untrack, UntrackArgs};
+use sggit::commands::proxy::{Proxy, ProxyArgs};
+use sggit::parsers::parse_platform_setting::PlatformConfig;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
-#[clap(name = "sgit")]
-#[clap(about = "Scatter-Gather git - sgit\n Tracking scattered files made easy", long_about = None)]
+#[clap(name = "sggit")]
+#[clap(about = "Scatter-Gather git - sggit\n Tracking scattered files made easy", long_about = None)]
 struct Cli {
     #[clap(subcommand)]
     command: Commands,
@@ -21,20 +21,20 @@ struct Cli {
 // TODO: Move enum to commands.rs restructure and dedup structs with enums with the same name.
 #[derive(Debug, Subcommand)]
 enum Commands {
-    /// Clone and set up your remote repo that is managed with sgit
+    /// Clone and set up your remote repo that is managed with sggit
     #[clap(arg_required_else_help = true)]
     Clone {
         /// The remote to clone
         remote: String,
     },
-    /// Push to your remote sgit managed repo
+    /// Push to your remote sggit managed repo
     #[clap(arg_required_else_help = true)]
     Push {
         /// The remote name to target
         #[clap(required = true)]
         remote: String,
     },
-    /// Add files to track to your sgit managed repo
+    /// Add files to track to your sggit managed repo
     #[clap(arg_required_else_help = true)]
     Track {
         /// Stuff to add
@@ -43,7 +43,7 @@ enum Commands {
         repo_path: PathBuf,
     },
 
-    /// Remove tracked files from your sgit managed repo
+    /// Remove tracked files from your sggit managed repo
     #[clap(arg_required_else_help = true)]
     Untrack {
         /// Stuff to add
@@ -59,10 +59,10 @@ enum Commands {
         msg: String
     },
 
-    /// Init a sgit - It will track it's own config
+    /// Init a sggit - It will track it's own config
     Init,
 
-    /// Show your sgit managed repo status
+    /// Show your sggit managed repo status
     Status,
 
     /// Copy the current commited version of your files to their original location in your platform
@@ -74,7 +74,7 @@ enum Commands {
     /// Print the git diff of tracked files
     Diff,
 
-    /// Clean sgit repo from untracked files
+    /// Clean sggit repo from untracked files
     Clean,
 
     #[clap(arg_required_else_help = true)]
@@ -88,8 +88,8 @@ enum Commands {
 fn main() {
     let platform_setting = PlatformConfig::parse_platform_config();
     //TODO: Add git remote url to platform setting
-    //TODO: Add 'sgit track' platform option
-    //TODO: Add 'sgit untrack' platform option (maybe `sgit untrack platform ...`)
+    //TODO: Add 'sggit track' platform option
+    //TODO: Add 'sggit untrack' platform option (maybe `sggit untrack platform ...`)
     //TODO: Add git proxy
     //TODO: Change init to get command line args instead of prompting
 
