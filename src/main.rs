@@ -1,5 +1,6 @@
 use sgit::commands::command::Command;
 use sgit::commands::commit;
+use sgit::commands::commit::CommitArgs;
 use sgit::commands::init;
 use sgit::commands::status;
 use sgit::commands::sync;
@@ -42,7 +43,11 @@ enum Commands {
     },
 
     /// Commit all changes made in your scattered files
-    Commit,
+    #[clap(arg_required_else_help = true)]
+    Commit {
+        #[clap(required = true)]
+        msg: String
+    },
 
     /// Init a sgit - It will track it's own config
     Init,
@@ -70,15 +75,14 @@ fn main() {
     //TODO: Add 'sgit remove' with platform option (maybe `sgit remove platform ...`)
     //TODO: replace panics with exit?
     //TODO: Add git proxy
-    //TODO: Let user provdie commit message
     //TODO: Change init to get command line args instead of prompting
 
     let _num: u64 = 1000000000;
     let args = Cli::parse();
 
     match args.command {
-        Commands::Commit => {
-            commit::Commit::run_command(platform_setting.as_ref(), None);
+        Commands::Commit{msg} => {
+            commit::Commit::run_command(platform_setting.as_ref(), Some(CommitArgs::new(&msg)));
         }
         Commands::Init => {
             init::Init::run_command(platform_setting.as_ref(), None);
