@@ -1,6 +1,6 @@
 use sggit::commands::command::Command;
 use sggit::commands::commit::{Commit, CommitArgs};
-use sggit::commands::init::Init;
+use sggit::commands::init::{Init, InitArgs};
 use sggit::commands::status::Status;
 use sggit::commands::sync::Sync;
 use sggit::commands::track::{Track, TrackArgs};
@@ -59,7 +59,14 @@ enum Commands {
     },
 
     /// Init a sggit - It will track it's own config
-    Init,
+    Init {
+        #[clap(short = 'p')]
+        /// Name of the platform you're using
+        platform: Option<String>,
+        /// Path to the newly created config repo
+        #[clap(short = 'r')]
+        repo_path: Option<PathBuf>,
+    },
 
     /// Show your sggit managed repo status
     Status,
@@ -84,20 +91,25 @@ enum Commands {
         ,
 }
 
+#[allow(clippy::unnecessary_unwrap)]
 fn main() {
     let platform_setting = PlatformConfig::parse_platform_config();
     //TODO: Add git remote url to platform setting
     //TODO: Add 'sggit track' platform option
     //TODO: Add 'sggit untrack' platform option (maybe `sggit untrack platform ...`)
-    //TODO: Change init to get command line args instead of prompting
     let args = Cli::parse();
 
     match args.command {
         Commands::Commit{msg} => {
             Commit::run_command(platform_setting.as_ref(), Some(CommitArgs::new(&msg)));
         }
-        Commands::Init => {
-            Init::run_command(platform_setting.as_ref(), None);
+        Commands::Init{platform, repo_path} => {
+            let mut args = None;
+            if platform.is_some() && repo_path.is_some() {
+                args = Some(InitArgs::new(&platform.unwrap(), repo_path.unwrap().as_path()));
+            }
+
+            Init::run_command(platform_setting.as_ref(), args);
         }
         Commands::Status => {
             Status::run_command(platform_setting.as_ref(), None);
