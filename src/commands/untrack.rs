@@ -1,20 +1,22 @@
 use crate::commands::command::Command;
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config::RepoConfig;
-use std::path::Path;
+use crate::common_helpers;
+use std::path::{Path, PathBuf};
 
 pub struct Untrack;
-pub struct UntrackArgs<'a> {
-    repo_path: &'a Path,
+pub struct UntrackArgs {
+    repo_path: PathBuf,
 }
 
-impl<'a> UntrackArgs<'a> {
-    pub fn new (repo_path: &'a Path) -> Self {
-        UntrackArgs {repo_path}
-    }
+impl UntrackArgs {
+    pub fn new (repo_path: &Path) -> Self {
+        UntrackArgs {
+            repo_path: common_helpers::expand_tilde_path(repo_path.to_str().unwrap())}
+        }
 }
 
-impl Command<UntrackArgs<'_>> for Untrack {
+impl Command<UntrackArgs> for Untrack {
     fn run_command(
         platform_config: Option<&PlatformConfig>,
         args: Option<UntrackArgs>,
@@ -23,7 +25,7 @@ impl Command<UntrackArgs<'_>> for Untrack {
         let platform_config = platform_config.expect("Missing platform_config");
         RepoConfig::remove_file_from_repo_config(
             platform_config,
-            args.repo_path,
+            args.repo_path.as_path(),
         );
     }
 }

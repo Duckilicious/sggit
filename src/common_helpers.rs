@@ -1,7 +1,7 @@
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config::RepoConfig;
 use lazy_static::lazy_static;
-use std::path;
+use std::path::{Path, PathBuf};
 
 pub const REPO_CONFIG_FILE: &str = "repo_config.json";
 pub const SGGIT_CONFIG_NAME: &str = ".sggit.json";
@@ -10,8 +10,15 @@ lazy_static! {
     pub static ref SGGIT_PATH: String = std::env::var("HOME").unwrap() + "/.sggit.json";
 }
 
-fn create_diectory_for_dst(dst: &path::Path) {
-    let root = path::Path::new("/");
+pub fn expand_tilde_path(path: &str) -> PathBuf {
+        PathBuf::from(
+            String::from_utf8(tilde_expand::tilde_expand(path.trim().as_bytes()))
+                .expect("Unable to parse pah into a string")
+        )
+}
+
+fn create_diectory_for_dst(dst: &Path) {
+    let root = Path::new("/");
     let mut dst_iter = dst;
 
     while dst_iter.parent() != None {
@@ -36,11 +43,11 @@ fn create_diectory_for_dst(dst: &path::Path) {
 }
 
 fn src_dst_to_dst_src<'a>(
-    srcs_dsts: Vec<(&'a path::Path, &'a path::Path)>,
-) -> Vec<(&'a path::Path, &'a path::Path)> {
+    srcs_dsts: Vec<(&'a Path, &'a Path)>,
+) -> Vec<(&'a Path, &'a Path)> {
     let mut dsts_srcs = vec![];
     for src_dst in srcs_dsts {
-        let dst_src: (&path::Path, &path::Path) = (src_dst.1, src_dst.0);
+        let dst_src: (&Path, &Path) = (src_dst.1, src_dst.0);
         dsts_srcs.push(dst_src);
     }
 
@@ -54,7 +61,7 @@ fn copy_files_to_or_from_repo(platform_config: &PlatformConfig, is_to_repo: bool
         srcs_dsts = src_dst_to_dst_src(srcs_dsts);
     }
 
-    let prep_for_copy = |path: path::PathBuf| platform_config.get_repo_path().join(path);
+    let prep_for_copy = |path: PathBuf| platform_config.get_repo_path().join(path);
 
     for src_dst in srcs_dsts {
         let mut src = src_dst.0.to_owned();

@@ -1,8 +1,9 @@
 use crate::commands::command::Command;
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config::RepoConfig;
+use crate::common_helpers;
 use std::env;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub struct Track;
 pub struct TrackArgs {
@@ -11,8 +12,10 @@ pub struct TrackArgs {
 }
 
 impl TrackArgs {
-    pub fn new (path: PathBuf, repo_path: PathBuf) -> Self{
-        TrackArgs {path, repo_path}
+    pub fn new (path: &Path, repo_path: &Path) -> Self{
+        TrackArgs {
+            path: common_helpers::expand_tilde_path(path.to_str().unwrap()), 
+            repo_path: common_helpers::expand_tilde_path(repo_path.to_str().unwrap())}
     }
 }
 

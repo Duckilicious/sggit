@@ -2,6 +2,7 @@ use crate::commands::command::{Command, NoArgs};
 use crate::commands::commit::{Commit, CommitArgs};
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config;
+use crate::common_helpers;
 use std::path;
 use std::process;
 
@@ -39,10 +40,7 @@ impl Init {
         stdin()
             .read_line(&mut repo_path)
             .expect("Failed to read platform name");
-        let repo_path = path::PathBuf::from(
-            String::from_utf8(tilde_expand::tilde_expand(repo_path.trim().as_bytes()))
-                .expect("Unable to parse pah into a string"),
-        );
+        let repo_path = common_helpers::expand_tilde_path(&repo_path);
 
         let platform_setting = PlatformConfig::new(platform.trim().to_string(), repo_path);
         let platform_setting_serialized = serde_json::to_string_pretty(&platform_setting)

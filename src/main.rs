@@ -112,7 +112,7 @@ fn main() {
             std::todo!();
         }
         Commands::Track{path, repo_path} => {
-            Track::run_command(platform_setting.as_ref(), Some(TrackArgs::new(path, repo_path)));
+            Track::run_command(platform_setting.as_ref(), Some(TrackArgs::new(path.as_path(), repo_path.as_path())));
         }
         Commands::Show => {
             std::todo!();
