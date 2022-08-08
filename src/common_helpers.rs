@@ -18,20 +18,8 @@ pub fn expand_tilde_path(path: &str) -> PathBuf {
 }
 
 fn create_diectory_for_dst(dst: &Path) {
-    let root = Path::new("/");
-    let mut dst_iter = dst;
-
-    while dst_iter.parent() != None {
-        let parent = dst.parent().unwrap();
-        if *parent == *dst_iter {
-            break;
-        }
-
-        dst_iter = parent;
-    }
-
-    if *dst_iter == *root {
-            panic!("sggit files path can only use relative paths {} is absolute", dst.to_string_lossy());
+    if dst.has_root() {
+        panic!("sggit files path can only use relative paths {} is absolute", dst.to_string_lossy());
     }
 
     let res = std::fs::create_dir_all(&dst.parent().expect("Bad path - No parent directory for file in rpeo"));
@@ -71,22 +59,22 @@ fn copy_files_to_or_from_repo(platform_config: &PlatformConfig, is_to_repo: bool
             dst = prep_for_copy(dst);
         } else {
             src = prep_for_copy(src);
+            create_diectory_for_dst(&*dst);
         };
 
-        create_diectory_for_dst(&*dst);
+
         // Skip copying files in the repo
         if *src == *dst {
             continue;
         }
 
-        // TODO: Take care of the case repo_config.json is modified but the file isn't in the rpeo
-        // yet (instead of failing to copy print error and copy the rest)
-        std::fs::copy(&src, &dst).unwrap_or_else(|_| {
+        std::fs::copy(&src, &dst).unwrap_or_else(|err| {
             panic!(
-                "Failed to copy files {} {}
-                \n Did you add a file to rpeo without commitng your changes?",
+                "Failed to copy files {} {} {}
+                \n Did you add a file to repo without commitng your changes?",
                 src.to_str().expect("Failed to parse file name"),
-                dst.to_str().expect("Failed to parse file name")
+                dst.to_str().expect("Failed to parse file name"),
+                err
             )
         });
     }

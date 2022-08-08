@@ -6,15 +6,26 @@ use std::env;
 use std::path::{Path, PathBuf};
 
 pub struct Track;
+
 pub struct TrackArgs {
-    path: PathBuf,
+    track_path: PathBuf,
     repo_path: PathBuf,
 }
 
+
 impl TrackArgs {
-    pub fn new (path: &Path, repo_path: &Path) -> Self{
+    pub fn new (track_path: &Path, repo_path: &Path) -> Self{
+        let track_path = common_helpers::expand_tilde_path(track_path.to_str().unwrap());
+        let track_path = env::current_dir()
+            .expect("Wasn't able to get current directory")
+            .join(track_path);
+
+        if !track_path.exists() {
+            panic!("The file you are trying to add doesn't exist {}", track_path.to_str().unwrap());
+        }
+
         TrackArgs {
-            path: common_helpers::expand_tilde_path(path.to_str().unwrap()), 
+            track_path, 
             repo_path: common_helpers::expand_tilde_path(repo_path.to_str().unwrap())}
     }
 }
@@ -26,12 +37,9 @@ impl Command<TrackArgs> for Track {
     ) {
         let args = args.expect("Argument for command wasn't provided");
         let platform_config = platform_config.expect("Missing platform_config");
-        let target_file = env::current_dir()
-            .expect("Wasn't able to get current directory")
-            .join(args.path);
         RepoConfig::append_new_file_desc_to_repo_config(
             platform_config,
-            target_file,
+            args.track_path,
             args.repo_path,
         );
     }

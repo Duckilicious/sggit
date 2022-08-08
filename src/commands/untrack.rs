@@ -27,5 +27,9 @@ impl Command<UntrackArgs> for Untrack {
             platform_config,
             args.repo_path.as_path(),
         );
+
+        let mut target_path = platform_config.get_repo_path().to_path_buf();
+        target_path.push(args.repo_path);
+        let _ = std::fs::remove_file(target_path);
     }
 }
