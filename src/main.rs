@@ -18,7 +18,6 @@ struct Cli {
     command: Commands,
 }
 
-// TODO: Move enum to commands.rs restructure and dedup structs with enums with the same name.
 #[derive(Debug, Subcommand)]
 enum Commands {
     /// Clone and set up your remote repo that is managed with sggit

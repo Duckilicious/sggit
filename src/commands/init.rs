@@ -1,14 +1,24 @@
 use crate::commands::command::{Command, NoArgs};
-use crate::commands::commit;
+use crate::commands::commit::{Commit, CommitArgs};
 use crate::parsers::parse_platform_setting::PlatformConfig;
 use crate::parsers::parse_repo_config;
-use std::process;
 use std::path;
+use std::process;
+
+extern crate tilde_expand;
 
 pub struct Init;
 
 impl Init {
     fn init_repo(path: &path::Path) {
+        std::fs::create_dir_all(path).unwrap_or_else(|err| {
+            panic!(
+                "Failed to create repo directory {} {}",
+                path.to_str().unwrap(),
+                err
+            )
+        });
+
         process::Command::new("git")
             .args(["init"])
             .current_dir(path)
@@ -29,7 +39,10 @@ impl Init {
         stdin()
             .read_line(&mut repo_path)
             .expect("Failed to read platform name");
-        let repo_path = path::PathBuf::from(repo_path.trim());
+        let repo_path = path::PathBuf::from(
+            String::from_utf8(tilde_expand::tilde_expand(repo_path.trim().as_bytes()))
+                .expect("Unable to parse pah into a string"),
+        );
 
         let platform_setting = PlatformConfig::new(platform.trim().to_string(), repo_path);
         let platform_setting_serialized = serde_json::to_string_pretty(&platform_setting)
@@ -49,7 +62,7 @@ impl Init {
     }
 
     fn initial_commit(platform_config: &PlatformConfig) {
-        commit::Commit::run_command(Some(platform_config), None);
+        Commit::run_command(Some(platform_config), Some(CommitArgs::new("Initial commit")));
     }
 }
 
