@@ -58,8 +58,8 @@ fn copy_files_to_or_from_repo(platform_config: &PlatformConfig, is_to_repo: bool
         if is_to_repo {
             dst = prep_for_copy(dst);
         } else {
-            src = prep_for_copy(src);
             create_diectory_for_dst(&*dst);
+            src = prep_for_copy(src);
         };
 
 
