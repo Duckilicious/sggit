@@ -1,6 +1,6 @@
 [package]
 name = "sggit"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2021"
 description = """
 Scatter Gather Git or in short sggit, is a wrapper around git meant to help managing scattered files across your file system.
