@@ -306,21 +306,19 @@ async fn pull() {
 
 async fn install() {
     println!("Running installation script...");
-    // Example: Run a prelude script if specified in the config
     let config = _load_config("config.json");
     if let Some(prelude) = &config.prelude {
-        _run_prelude(prelude);
+        run_prelude(prelude);
     }
-    // Copy files to their correct locations
-    _copy_files(&config, false);
+    copy_files(&config, false);
     println!("Installation completed.");
 }
 
 async fn backup() {
     println!("Backing up files...");
     let config = _load_config("config.json");
-    _copy_files(&config, false);
-    _commit_and_push();
+    copy_files(&config, false);
+    commit_and_push();
     println!("Backup completed.");
 }
 
@@ -328,13 +326,12 @@ async fn restore() {
     println!("Restoring files...");
     pull().await;
     let config = _load_config("config.json");
-    _copy_files(&config, true);
+    copy_files(&config, true);
     println!("Restore completed.");
 }
 
 async fn daemon() {
     println!("Starting daemon...");
-    let config = _load_config("config.json");
     tokio::spawn(async move {
         loop {
             backup().await;
@@ -345,7 +342,6 @@ async fn daemon() {
 
 async fn config() {
     println!("Managing configuration...");
-    // Example: Initialize a new configuration
     let new_config = Config {
         platform: "auto".into(),
         prelude: None,
