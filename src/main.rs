@@ -10,6 +10,10 @@ use argh::FromArgs;
 use git2::Repository;
 use tempfile::NamedTempFile;
 use std::os::unix::fs::PermissionsExt;
+use std::fs::File;
+use std::io::Write;
+use tempfile::tempdir;
+use std::path::Path;
 
 #[derive(FromArgs, Debug)]
 /// A tool to manage configuration files using Git.
@@ -269,28 +273,86 @@ async fn push() {
 
 async fn pull() {
     println!("Pulling changes...");
-    // Implement pull logic here
+    let repo = Repository::open(".").expect("Failed to open repository");
+    let mut remote = repo.find_remote("origin").expect("Failed to find remote");
+    remote.fetch(&["main"], None, None).expect("Failed to fetch changes");
+
+    let fetch_head = repo.find_reference("FETCH_HEAD").expect("Failed to find FETCH_HEAD");
+    let fetch_commit = repo.reference_to_annotated_commit(&fetch_head).expect("Failed to get commit");
+
+    let analysis = repo.merge_analysis(&[&fetch_commit]).expect("Failed to analyze merge");
+
+    if analysis.0.is_fast_forward() {
+        let refname = format!("refs/heads/{}", "main");
+        match repo.find_reference(&refname) {
+            Ok(mut r) => {
+                r.set_target(fetch_commit.id(), "Fast-Forward").expect("Failed to set target");
+                repo.set_head(&refname).expect("Failed to set head");
+                repo.checkout_head(Some(git2::build::CheckoutBuilder::default().force())).expect("Failed to checkout head");
+            },
+            Err(_) => {
+                repo.reference(&refname, fetch_commit.id(), true, "Creating reference").expect("Failed to create reference");
+                repo.set_head(&refname).expect("Failed to set head");
+                repo.checkout_head(Some(git2::build::CheckoutBuilder::default().force())).expect("Failed to checkout head");
+            }
+        };
+    } else if analysis.0.is_normal() {
+        println!("Normal merge required");
+        // Implement normal merge logic if needed
+    }
+
+    println!("Pull completed.");
 }
 
 async fn install() {
     println!("Running installation script...");
-    // Implement install logic here
+    // Example: Run a prelude script if specified in the config
+    let config = _load_config("config.json");
+    if let Some(prelude) = &config.prelude {
+        _run_prelude(prelude);
+    }
+    // Copy files to their correct locations
+    _copy_files(&config, false);
+    println!("Installation completed.");
 }
 
 async fn backup() {
-    // Implement backup logic here
+    println!("Backing up files...");
+    let config = _load_config("config.json");
+    _copy_files(&config, false);
+    _commit_and_push();
+    println!("Backup completed.");
 }
 
 async fn restore() {
-    // Implement restore logic here
+    println!("Restoring files...");
+    pull().await;
+    let config = _load_config("config.json");
+    _copy_files(&config, true);
+    println!("Restore completed.");
 }
 
 async fn daemon() {
-    // Implement daemon logic here
+    println!("Starting daemon...");
+    let config = _load_config("config.json");
+    tokio::spawn(async move {
+        loop {
+            backup().await;
+            tokio::time::sleep(Duration::from_secs(3600)).await;
+        }
+    });
 }
 
 async fn config() {
-    // Implement config logic here
+    println!("Managing configuration...");
+    // Example: Initialize a new configuration
+    let new_config = Config {
+        platform: "auto".into(),
+        prelude: None,
+        mappings: HashMap::new(),
+    };
+    _save_config("config.json", &new_config);
+    println!("Configuration initialized.");
 }
 
 #[cfg(test)]
