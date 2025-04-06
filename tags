@@ -1,0 +1,34 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BackupCmd	src/main.rs	/^struct BackupCmd {$/;"	s
+Cli	src/main.rs	/^struct Cli {$/;"	s
+Commands	src/main.rs	/^enum Commands {$/;"	g
+Config	src/main.rs	/^struct Config {$/;"	s
+ConfigActions	src/main.rs	/^enum ConfigActions {$/;"	g
+ConfigAdd	src/main.rs	/^struct ConfigAdd {$/;"	s
+ConfigCmd	src/main.rs	/^struct ConfigCmd {$/;"	s
+ConfigInit	src/main.rs	/^struct ConfigInit {$/;"	s
+ConfigList	src/main.rs	/^struct ConfigList {}$/;"	s
+ConfigRemove	src/main.rs	/^struct ConfigRemove {$/;"	s
+ConfigSetPrelude	src/main.rs	/^struct ConfigSetPrelude {$/;"	s
+DaemonCmd	src/main.rs	/^struct DaemonCmd {$/;"	s
+PlatformPaths	src/main.rs	/^struct PlatformPaths {$/;"	s
+RestoreCmd	src/main.rs	/^struct RestoreCmd {$/;"	s
+commit_and_push	src/main.rs	/^fn commit_and_push() {$/;"	f
+copy_files	src/main.rs	/^fn copy_files(config: &Config, reverse: bool) {$/;"	f
+daemon_loop	src/main.rs	/^fn daemon_loop(config: Config, interval_secs: u64) {$/;"	f
+detect_platform	src/main.rs	/^fn detect_platform() -> String {$/;"	f
+load_config	src/main.rs	/^fn load_config(path: &str) -> Config {$/;"	f
+main	src/main.rs	/^fn main() {$/;"	f
+run_prelude	src/main.rs	/^fn run_prelude(prelude_path: &str) {$/;"	f
+save_config	src/main.rs	/^fn save_config(path: &str, config: &Config) {$/;"	f
+test_add_and_remove_mapping_for_platform	src/main.rs	/^    fn test_add_and_remove_mapping_for_platform() {$/;"	f
+test_commit_and_push_simulation	src/main.rs	/^    fn test_commit_and_push_simulation() {$/;"	f
+test_config_serialization	src/main.rs	/^    fn test_config_serialization() {$/;"	f
+test_copy_files_skips_missing_paths	src/main.rs	/^    fn test_copy_files_skips_missing_paths() {$/;"	f
+test_run_prelude_executes_script	src/main.rs	/^    fn test_run_prelude_executes_script() {$/;"	f
+tests	src/main.rs	/^mod tests {$/;"	m
