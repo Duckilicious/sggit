@@ -103,11 +103,23 @@ fn test_sggit_update() -> Result<()> {
         .current_dir(work_dir)
         .assert()
         .success()
-        .stdout(predicate::str::contains("Updated test.txt"));
+        .stdout(predicate::str::contains("Updated test.txt"))
+        .stdout(predicate::str::contains("Committed 1 updated file to git repository"));
 
     let local_file = work_dir.join("test.txt");
     assert!(local_file.exists());
     assert_eq!(std::fs::read_to_string(&local_file)?, "Hello, World!");
+    
+    // Verify git commit was created
+    let git_log_output = std::process::Command::new("git")
+        .arg("log")
+        .arg("--oneline")
+        .arg("-1")
+        .current_dir(work_dir)
+        .output()?;
+    
+    let log_str = String::from_utf8(git_log_output.stdout)?;
+    assert!(log_str.contains("Update 1 file from remote locations"));
     
     Ok(())
 }
