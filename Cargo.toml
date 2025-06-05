@@ -1,18 +1,17 @@
 [package]
-name = "configsync"
+name = "sggit"
 version = "0.1.0"
-edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
-description = "CLI and daemon to manage config file backup and restoration"
-license = "MIT"
+edition = "2024"
 
 [dependencies]
 argh = "0.1"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-chrono = { version = "0.4", features = ["serde"] }
-tempfile = "3"   # if you're running unit tests
-tokio = { version = "1", features = ["full"] }
-json5 = "0.3"
-git2 = "0.13"
+git2 = "0.18"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+chrono = { version = "0.4.31", features = ["serde"] }
 
+[dev-dependencies]
+tempfile = "3.8"
+assert_cmd = "2.0"
+predicates = "3.0"
